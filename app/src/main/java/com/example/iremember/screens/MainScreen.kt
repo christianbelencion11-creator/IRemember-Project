@@ -1,4 +1,4 @@
-﻿package com.example.iremember.screens
+package com.example.iremember.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
@@ -15,6 +15,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
@@ -72,6 +75,7 @@ fun MainScreen(
     onNotesClick: () -> Unit = {},
     onCardsClick: () -> Unit = {},
     onAboutClick: () -> Unit = {},
+    onPermissionsClick: () -> Unit = {},
     onLogout: () -> Unit = {},
     onAllItemsClick: () -> Unit = {},
     onAllCategoriesClick: () -> Unit = {},
@@ -79,7 +83,9 @@ fun MainScreen(
     openSearchSignal: StateFlow<Boolean> = MutableStateFlow(false),
     onOpenSearchConsumed: () -> Unit = {}
 ) {
+    val context = LocalContext.current
     var selectedTab by rememberSaveable { mutableStateOf(BottomNavTab.Home) }
+    var scrollToProfileSettings by rememberSaveable { mutableStateOf(false) }
     var bottomNavVisible by rememberSaveable { mutableStateOf(true) }
     var lastInteraction by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var launchVoiceSearch by remember { mutableStateOf(false) }
@@ -148,41 +154,42 @@ fun MainScreen(
                     profileImageUri = profileImageUri,
                     themeMode = themeMode,
                     onThemeModeChanged = onThemeModeChanged,
-                    onHome = {
+                    onCategories = {
                         onUserInteraction()
-                        closeDrawerThen { selectedTab = BottomNavTab.Home }
-                    },
-                    onSearch = {
-                        onUserInteraction()
-                        closeDrawerThen { selectedTab = BottomNavTab.Search }
-                    },
-                    onAddItem = {
-                        onUserInteraction()
-                        closeDrawerThen { selectedTab = BottomNavTab.AddItem }
-                    },
-                    onAlerts = {
-                        onUserInteraction()
-                        closeDrawerThen { selectedTab = BottomNavTab.Alerts }
-                    },
-                    onNews = {
-                        onUserInteraction()
-                        closeDrawerThen { onNotificationsClick() }
-                    },
-                    onHistory = {
-                        onUserInteraction()
-                        closeDrawerThen { selectedTab = BottomNavTab.History }
+                        closeDrawerThen { onAllCategoriesClick() }
                     },
                     onNotes = {
                         onUserInteraction()
                         closeDrawerThen { onNotesClick() }
                     },
-                    onCards = {
+                    onActivityLog = {
                         onUserInteraction()
-                        closeDrawerThen { onCardsClick() }
+                        closeDrawerThen { selectedTab = BottomNavTab.History }
                     },
-                    onProfile = {
+                    onAppSettings = {
                         onUserInteraction()
+                        scrollToProfileSettings = true
                         closeDrawerThen { selectedTab = BottomNavTab.Profile }
+                    },
+                    onPermissions = {
+                        onUserInteraction()
+                        closeDrawerThen { onPermissionsClick() }
+                    },
+                    onNews = {
+                        onUserInteraction()
+                        closeDrawerThen { onNotificationsClick() }
+                    },
+                    onHelpFeedback = {
+                        onUserInteraction()
+                        val intent = Intent(Intent.ACTION_SENDTO).apply {
+                            data = Uri.parse("mailto:iremember.support@uc.edu.ph")
+                        }
+                        runCatching { context.startActivity(intent) }
+                            .onFailure { closeDrawerThen { onAboutClick() } }
+                    },
+                    onAboutApp = {
+                        onUserInteraction()
+                        closeDrawerThen { onAboutClick() }
                     },
                     onSignOut = {
                         closeDrawerThen(onLogout)
@@ -366,11 +373,17 @@ fun MainScreen(
                             onUserInteraction()
                             onChangePassword()
                         },
+                        onPermissionsClick = {
+                            onUserInteraction()
+                            onPermissionsClick()
+                        },
                         onAboutClick = {
                             onUserInteraction()
                             onAboutClick()
                         },
                         onLogout = onLogout,
+                        scrollToSettings = scrollToProfileSettings,
+                        onScrollToSettingsConsumed = { scrollToProfileSettings = false },
                         onMenuClick = {
                             onUserInteraction()
                             scope.launch { drawerState.open() }

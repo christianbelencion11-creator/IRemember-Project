@@ -1,4 +1,4 @@
-﻿package com.example.iremember.screens
+package com.example.iremember.screens
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -21,6 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.BrightnessAuto
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.DarkMode
@@ -29,8 +30,8 @@ import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -115,19 +116,27 @@ fun ProfileScreen(
     location: String = "",
     onEditProfileClick: () -> Unit = {},
     onChangePassword: () -> Unit = {},
+    onPermissionsClick: () -> Unit = {},
     onAboutClick: () -> Unit = {},
     onLogout: () -> Unit = {},
     onMenuClick: () -> Unit = {},
     onUserInteraction: () -> Unit = {},
     bottomNavVisible: Boolean = true,
+    scrollToSettings: Boolean = false,
+    onScrollToSettingsConsumed: () -> Unit = {},
     onTotalItemsClick: () -> Unit = {},
     onCategoriesClick: () -> Unit = {},
     onRecentClick: () -> Unit = {}
 ) {
-    val allItems by viewModel.allItems.collectAsState()
-    val stats = computeStats(allItems)
-
     val bottomScrollPadding = mainTabBottomScrollPadding(bottomNavVisible)
+    val scrollState = rememberScrollState()
+
+    androidx.compose.runtime.LaunchedEffect(scrollToSettings) {
+        if (scrollToSettings) {
+            scrollState.animateScrollTo(scrollState.maxValue)
+            onScrollToSettingsConsumed()
+        }
+    }
 
     if (showProfilePhotoUpdated) {
         ProfileUpdatedSuccessDialog(onDone = onProfilePhotoUpdatedDismissed)
@@ -145,57 +154,49 @@ fun ProfileScreen(
             )
         }
     ) { scrollModifier ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .then(scrollModifier)
-                .verticalScroll(rememberScrollState())
-                .padding(
-                    start = Spacing.xl,
-                    end = Spacing.xl,
-                    top = Spacing.xl,
-                    bottom = bottomScrollPadding
-                ),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Spacing.lg)
-        ) {
-            ProfileCard(
-                profileImageUri = profileImageUri,
-                onProfileImageChanged = onProfileImageChanged,
-                displayName = displayName,
-                username = username,
-                bio = bio,
-                onEditClick = onEditProfileClick
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .then(scrollModifier)
+                    .verticalScroll(scrollState)
+                    .padding(
+                        start = Spacing.xl,
+                        end = Spacing.xl,
+                        top = Spacing.xl,
+                        bottom = bottomScrollPadding
+                    ),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Spacing.lg)
+            ) {
+                ProfileCard(
+                    profileImageUri = profileImageUri,
+                    onProfileImageChanged = onProfileImageChanged,
+                    displayName = displayName,
+                    username = username,
+                    bio = bio,
+                    onEditClick = onEditProfileClick
+                )
 
-            PersonalDetailsCard(
-                fullName = fullName,
-                birthday = birthday,
-                family = family,
-                phone = phone,
-                location = location
-            )
+                PersonalDetailsCard(
+                    fullName = fullName,
+                    birthday = birthday,
+                    family = family,
+                    phone = phone,
+                    location = location
+                )
 
-            StatsSection(
-                stats = stats,
-                onTotalItemsClick = onTotalItemsClick,
-                onCategoriesClick = onCategoriesClick,
-                onRecentClick = onRecentClick
-            )
+                SettingsCard(
+                    themeMode = themeMode,
+                    onThemeModeChanged = onThemeModeChanged,
+                    onChangePassword = onChangePassword,
+                    onPermissionsClick = onPermissionsClick,
+                    onLogout = onLogout
+                )
 
-            SettingsCard(
-                themeMode = themeMode,
-                onThemeModeChanged = onThemeModeChanged,
-                onChangePassword = onChangePassword,
-                onLogout = onLogout
-            )
+                AboutCard(onClick = onAboutClick)
 
-            PermissionsCard()
-
-            AboutCard(onClick = onAboutClick)
-
-            Spacer(Modifier.height(Spacing.xl))
-        }
+                Spacer(Modifier.height(Spacing.xl))
+            }
     }
 }
 
@@ -340,6 +341,7 @@ private fun SettingsCard(
     themeMode: ThemeMode,
     onThemeModeChanged: (ThemeMode) -> Unit,
     onChangePassword: () -> Unit,
+    onPermissionsClick: () -> Unit,
     onLogout: () -> Unit
 ) {
     var themeMenuExpanded by remember { mutableStateOf(false) }
@@ -457,6 +459,40 @@ private fun SettingsCard(
             }
             Spacer(Modifier.height(Spacing.md))
             HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
+            Spacer(Modifier.height(Spacing.md))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onPermissionsClick)
+                    .padding(vertical = Spacing.sm),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Security,
+                    contentDescription = null,
+                    tint = ProfileIconAccents.AppSettings,
+                    modifier = Modifier.padding(end = Spacing.md)
+                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        "Permissions",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        "Camera, notifications, and biometrics",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Spacer(Modifier.height(Spacing.md))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
             Spacer(Modifier.height(Spacing.lg))
             OutlinedButton(
                 onClick = onLogout,
@@ -466,7 +502,7 @@ private fun SettingsCard(
                 )
             ) {
                 Icon(
-                    imageVector = Icons.Default.Logout,
+                    imageVector = Icons.AutoMirrored.Filled.Logout,
                     contentDescription = null,
                     modifier = Modifier.padding(end = Spacing.sm)
                 )
@@ -482,164 +518,7 @@ private fun themeModeIcon(mode: ThemeMode) = when (mode) {
     ThemeMode.Auto -> Icons.Default.BrightnessAuto
 }
 
-@Composable
-private fun PermissionsCard() {
-    val context = LocalContext.current
-    val activity = context as? FragmentActivity
-    var notifRefresh by remember { mutableStateOf(0) }
 
-    val notificationsGranted = remember(notifRefresh) {
-        if (Build.VERSION.SDK_INT < 33) {
-            true
-        } else {
-            ContextCompat.checkSelfPermission(
-                context,
-                android.Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
-        }
-    }
-
-    val biometricAvailable = remember(activity) {
-        activity?.let { BiometricHelper.canAuthenticate(it) } == true
-    }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) {
-        notifRefresh++
-    }
-
-    fun openAppSettings() {
-        val intent = Intent(
-            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-            Uri.fromParts("package", context.packageName, null)
-        )
-        context.startActivity(intent)
-    }
-
-    val dark = isAppDarkTheme()
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
-        border = if (dark) darkSurfaceBorder() else null,
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (dark) 0.dp else Dimensions.cardElevation
-        ),
-        colors = CardDefaults.cardColors(
-            containerColor = if (dark) Color.Transparent else MaterialTheme.colorScheme.surface
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .darkCardGradientFill(dark)
-                .padding(Spacing.xl)
-        ) {
-            Text(
-                text = "Permissions",
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Spacer(Modifier.height(Spacing.md))
-
-            PermissionRow(
-                icon = Icons.Default.Notifications,
-                iconTint = ProfileIconAccents.Notifications,
-                title = "Notifications",
-                subtitle = if (notificationsGranted) {
-                    "Allowed — used for Remind Me alerts"
-                } else {
-                    "Not allowed — tap to enable reminders"
-                },
-                onClick = {
-                    if (Build.VERSION.SDK_INT >= 33 && !notificationsGranted) {
-                        permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-                    } else {
-                        openAppSettings()
-                    }
-                }
-            )
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = Spacing.sm),
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
-            )
-            PermissionRow(
-                icon = Icons.Default.Fingerprint,
-                iconTint = ProfileIconAccents.Biometrics,
-                title = "Biometrics",
-                subtitle = if (biometricAvailable) {
-                    "Available — used to unlock with fingerprint / face"
-                } else {
-                    "Not available on this device"
-                },
-                onClick = { openAppSettings() }
-            )
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = Spacing.sm),
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
-            )
-            PermissionRow(
-                icon = Icons.Default.CameraAlt,
-                iconTint = ProfileIconAccents.Camera,
-                title = "Camera & Photos",
-                subtitle = "Used when adding item photos or your profile picture",
-                onClick = { openAppSettings() }
-            )
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = Spacing.sm),
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
-            )
-            PermissionRow(
-                icon = Icons.Default.Settings,
-                iconTint = ProfileIconAccents.AppSettings,
-                title = "Open app settings",
-                subtitle = "Manage all permissions in Android settings",
-                onClick = { openAppSettings() }
-            )
-        }
-    }
-}
-
-@Composable
-private fun PermissionRow(
-    icon: ImageVector,
-    iconTint: Color,
-    title: String,
-    subtitle: String,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = Spacing.sm),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = iconTint,
-            modifier = Modifier.padding(end = Spacing.md)
-        )
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                title,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
 
 @Composable
 private fun AboutCard(onClick: () -> Unit) {

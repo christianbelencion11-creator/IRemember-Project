@@ -1,4 +1,4 @@
-﻿package com.example.iremember.ui.components
+package com.example.iremember.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -64,6 +64,7 @@ fun IRememberSearchBar(
             onValueChange = onQueryChange,
             modifier = Modifier
                 .fillMaxWidth()
+                .preventArrowFocusEscape()
                 .clip(shape)
                 .then(
                     if (onClick != null) {

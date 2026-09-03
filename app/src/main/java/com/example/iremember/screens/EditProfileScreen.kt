@@ -1,4 +1,4 @@
-﻿package com.example.iremember.screens
+package com.example.iremember.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import com.example.iremember.ui.components.HeaderIconButton
 import com.example.iremember.ui.components.PremiumScaffold
 import com.example.iremember.ui.components.ProfileAvatar
+import com.example.iremember.ui.components.preventArrowFocusEscape
 import com.example.iremember.ui.theme.Dimensions
 import com.example.iremember.ui.theme.Spacing
 
@@ -258,7 +259,9 @@ private fun EditProfileTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .preventArrowFocusEscape(),
         singleLine = minLines == 1,
         minLines = minLines,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),

@@ -1,4 +1,4 @@
-﻿package com.example.iremember.ui.components
+package com.example.iremember.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -93,12 +93,6 @@ fun AddSpeedDialMenu(
                     label = "Notes",
                     accent = Color(0xFF0D9488),
                     onClick = onNotes
-                )
-                AddMenuAction(
-                    icon = Icons.Outlined.AccountBalanceWallet,
-                    label = "Wallet",
-                    accent = Color(0xFF6366F1),
-                    onClick = onCards
                 )
                 AddMenuAction(
                     icon = Icons.Default.PostAdd,

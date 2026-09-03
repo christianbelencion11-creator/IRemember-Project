@@ -1,4 +1,4 @@
-﻿package com.example.iremember.screens.auth
+package com.example.iremember.screens.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -53,6 +53,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.iremember.auth.AccountRepository
 import com.example.iremember.auth.UsernameAuth
+import com.example.iremember.ui.components.preventArrowFocusEscape
 import com.example.iremember.ui.components.AuthCardColor
 import com.example.iremember.ui.components.AuthErrorText
 import com.example.iremember.ui.components.AuthFieldBorderColor
@@ -484,7 +485,9 @@ fun AuthTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .preventArrowFocusEscape(),
         singleLine = true,
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,

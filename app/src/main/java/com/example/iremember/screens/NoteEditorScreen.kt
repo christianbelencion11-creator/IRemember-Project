@@ -1,4 +1,4 @@
-﻿package com.example.iremember.screens
+package com.example.iremember.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -65,6 +65,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
+import com.example.iremember.ui.components.preventArrowFocusEscape
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.iremember.model.NoteAccents
 import com.example.iremember.ui.components.HeaderIconButton
@@ -213,7 +214,9 @@ fun NoteEditorScreen(
                                 onValueChange = { title = it },
                                 label = { Text("Title") },
                                 placeholder = { Text("Grocery list, errands…") },
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .preventArrowFocusEscape(),
                                 singleLine = true,
                                 keyboardOptions = KeyboardOptions(
                                     capitalization = KeyboardCapitalization.Sentences
@@ -350,6 +353,7 @@ fun NoteEditorScreen(
                                     placeholder = { Text("Write anything you need to remember…") },
                                     modifier = Modifier
                                         .fillMaxWidth()
+                                        .preventArrowFocusEscape()
                                         .heightIn(min = 220.dp),
                                     minLines = 8,
                                     keyboardOptions = KeyboardOptions(
@@ -575,7 +579,9 @@ private fun ChecklistEditorRow(
         OutlinedTextField(
             value = item.text,
             onValueChange = onTextChange,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .preventArrowFocusEscape(),
             placeholder = { Text("List item") },
             singleLine = true,
             keyboardOptions = KeyboardOptions(

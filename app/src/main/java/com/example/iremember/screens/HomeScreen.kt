@@ -1,4 +1,4 @@
-﻿package com.example.iremember.screens
+package com.example.iremember.screens
 
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -140,11 +140,8 @@ fun HomeScreen(
     val allItems by viewModel.allItems.collectAsState()
     val activeReminders by viewModel.activeReminders.collectAsState()
     val overdueUnfound by viewModel.overdueUnfoundItems.collectAsState()
-    // Wallet + Notes live on Home too, so the whole library is visible in one place.
-    val bankVm: BankCardViewModel = composeViewModel(factory = BankCardViewModel.Factory)
+    // Notes live on Home, so quick access to notes is visible on the dashboard.
     val notesVm: NoteViewModel = composeViewModel(factory = NoteViewModel.Factory)
-    val walletTotal by bankVm.totalBalance.collectAsState()
-    val cards by bankVm.allCards.collectAsState()
     val notes by notesVm.allNotes.collectAsState()
     val stats = computeStats(allItems)
     val uniqueCategories = remember(allItems) { allItems.map { it.category }.distinct() }
@@ -248,10 +245,7 @@ fun HomeScreen(
 
             item {
                 LibraryQuickAccess(
-                    walletTotal = walletTotal,
-                    cardCount = cards.size,
                     noteCount = notes.size,
-                    onWalletClick = onCardsClick,
                     onNotesClick = onNotesClick
                 )
             }
@@ -489,14 +483,7 @@ private fun HomeHeader(
     onWeatherClick: () -> Unit
 ) {
     val secondaryAlpha = (1f - collapseFraction).coerceIn(0f, 1f)
-    // Cycle the advice line through the tips; remember() survives header recompositions on scroll.
-    var adviceIndex by remember { mutableIntStateOf(0) }
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(4500)
-            adviceIndex = (adviceIndex + 1) % homeAdviceTips.size
-        }
-    }
+    val calendarDate = remember { com.example.iremember.util.formatHeaderCalendarDate() }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -566,23 +553,18 @@ private fun HomeHeader(
                         style = MaterialTheme.typography.headlineSmall
                     )
                 }
-                // Rotating short advice line — never static; fades to the next tip.
-                Crossfade(
-                    targetState = adviceIndex,
-                    animationSpec = tween(durationMillis = 600),
-                    label = "homeAdvice",
+                // Working calendar date header
+                Text(
+                    text = calendarDate,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
                         .padding(top = Spacing.xxs)
                         .alpha(secondaryAlpha)
-                ) { index ->
-                    Text(
-                        text = homeAdviceTips[index],
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.80f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
+                )
             }
             WeatherWidget(
                 weather = weather,
@@ -609,11 +591,6 @@ private fun HeaderActionsRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Spacing.xs)
     ) {
-        HeaderIconButton(
-            icon = Icons.AutoMirrored.Filled.Article,
-            contentDesc = "News",
-            onClick = onNotificationsClick
-        )
         HeaderIconButton(
             icon = Icons.Default.Notifications,
             contentDesc = "Alerts",
@@ -871,10 +848,7 @@ private fun MascotAssistantCard(totalItems: Int, categories: Int) {
 
 @Composable
 private fun LibraryQuickAccess(
-    walletTotal: Double,
-    cardCount: Int,
     noteCount: Int,
-    onWalletClick: () -> Unit,
     onNotesClick: () -> Unit
 ) {
     Column {
@@ -884,29 +858,15 @@ private fun LibraryQuickAccess(
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(bottom = Spacing.sm)
         )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(Spacing.md)
-        ) {
-            QuickAccessCard(
-                icon = Icons.Outlined.AccountBalanceWallet,
-                accent = Color(0xFF10B981),
-                label = "Wallet",
-                primary = CardFormat.peso(walletTotal),
-                secondary = if (cardCount == 1) "1 card" else "$cardCount cards",
-                onClick = onWalletClick,
-                modifier = Modifier.weight(1f)
-            )
-            QuickAccessCard(
-                icon = Icons.AutoMirrored.Filled.Notes,
-                accent = Color(0xFF0D9488),
-                label = "Notes",
-                primary = noteCount.toString(),
-                secondary = if (noteCount == 1) "note saved" else "notes saved",
-                onClick = onNotesClick,
-                modifier = Modifier.weight(1f)
-            )
-        }
+        QuickAccessCard(
+            icon = Icons.AutoMirrored.Filled.Notes,
+            accent = Color(0xFF0D9488),
+            label = "Notes",
+            primary = noteCount.toString(),
+            secondary = if (noteCount == 1) "note saved" else "notes saved",
+            onClick = onNotesClick,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
@@ -1111,14 +1071,7 @@ private fun LocalDataHomeBanner(onDismiss: () -> Unit) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/** Short, friendly one-liners that rotate under the user's name on Home. */
-private val homeAdviceTips = listOf(
-    "Let's keep your things safe. 💚",
-    "Tap any item to see where it is. 📍",
-    "A place for everything. 📦",
-    "Snap it, save it, find it. 📸",
-    "Never lose track of your stuff. 🔒"
-)
+
 
 private fun timeGreeting(): String {
     val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)

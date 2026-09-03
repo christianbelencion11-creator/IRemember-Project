@@ -1,4 +1,4 @@
-﻿package com.example.iremember.screens
+package com.example.iremember.screens
 
 import android.content.Context
 import android.net.Uri
@@ -58,6 +58,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import com.example.iremember.ui.components.preventArrowFocusEscape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
@@ -345,7 +346,7 @@ fun AddItemScreen(
                 IconTextField(
                     value = location,
                     onValueChange = { location = it },
-                    placeholder = "Where did you last see it?",
+                    placeholder = "Where will you put it?",
                     leadingIcon = Icons.Default.Place,
                     isError = locationError,
                     errorMessage = "Please complete this field"
@@ -588,7 +589,9 @@ private fun IconTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .preventArrowFocusEscape(),
         singleLine = minLines == 1,
         minLines = minLines,
         isError = isError,

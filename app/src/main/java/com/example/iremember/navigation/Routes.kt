@@ -1,4 +1,4 @@
-﻿package com.example.iremember.navigation
+package com.example.iremember.navigation
 
 object Routes {
     const val SPLASH = "splash"
@@ -22,6 +22,7 @@ object Routes {
     const val CARDS = "cards"
     const val CARD_EDITOR = "card_editor?cardId={cardId}"
     const val ABOUT = "about"
+    const val PERMISSIONS = "permissions"
     const val PRIVACY_POLICY = "privacy_policy"
     const val ALL_ITEMS = "all_items"
     const val ALL_CATEGORIES = "all_categories"

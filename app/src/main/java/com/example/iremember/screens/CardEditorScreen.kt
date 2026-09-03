@@ -1,4 +1,4 @@
-﻿package com.example.iremember.screens
+package com.example.iremember.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -58,6 +58,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.iremember.ui.components.preventArrowFocusEscape
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.iremember.model.BankCardStyles
 import com.example.iremember.ui.components.BankCardFace
@@ -238,7 +239,9 @@ fun CardEditorScreen(
                                 onValueChange = { bankName = it },
                                 label = { Text("Bank / wallet name") },
                                 placeholder = { Text("BPI, GCash, BDO…") },
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .preventArrowFocusEscape(),
                                 singleLine = true,
                                 isError = nameError,
                                 supportingText = if (nameError) {
@@ -279,7 +282,9 @@ fun CardEditorScreen(
                                 onValueChange = { cardNumber = CardFormat.sanitizeNumber(it) },
                                 label = { Text("Card / account number") },
                                 placeholder = { Text("1234 5678 9012 3456") },
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .preventArrowFocusEscape(),
                                 singleLine = true,
                                 isError = numberError,
                                 supportingText = if (numberError) {
@@ -303,7 +308,9 @@ fun CardEditorScreen(
                                 },
                                 label = { Text("Balance (₱)") },
                                 placeholder = { Text("0.00") },
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .preventArrowFocusEscape(),
                                 singleLine = true,
                                 isError = balanceError,
                                 supportingText = if (balanceError) {
@@ -317,7 +324,9 @@ fun CardEditorScreen(
                                 onValueChange = { cardHolder = it },
                                 label = { Text("Cardholder name (optional)") },
                                 placeholder = { Text("Juan Dela Cruz") },
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .preventArrowFocusEscape(),
                                 singleLine = true,
                                 keyboardOptions = KeyboardOptions(
                                     capitalization = KeyboardCapitalization.Words

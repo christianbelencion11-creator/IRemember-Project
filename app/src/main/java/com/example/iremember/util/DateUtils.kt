@@ -1,4 +1,4 @@
-﻿package com.example.iremember.util
+package com.example.iremember.util
 
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -28,4 +28,18 @@ fun formatRelativeTime(timestamp: Long, now: Long = System.currentTimeMillis()):
         else -> formatDate(timestamp)
     }
 }
+
+/**
+ * Formats the current date in uppercase format: "THURSDAY, SEPT 3".
+ * September is formatted as "SEPT" matching the user's sample format.
+ */
+fun formatHeaderCalendarDate(now: Long = System.currentTimeMillis()): String {
+    val date = Date(now)
+    val dayOfWeek = SimpleDateFormat("EEEE", Locale.ENGLISH).format(date).uppercase(Locale.ENGLISH)
+    val rawMonth = SimpleDateFormat("MMM", Locale.ENGLISH).format(date).uppercase(Locale.ENGLISH)
+    val month = if (rawMonth == "SEP") "SEPT" else rawMonth
+    val dayOfMonth = SimpleDateFormat("d", Locale.ENGLISH).format(date)
+    return "$dayOfWeek, $month $dayOfMonth"
+}
+
 

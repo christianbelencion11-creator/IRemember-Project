@@ -1,4 +1,4 @@
-﻿package com.example.iremember.navigation
+package com.example.iremember.navigation
 
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -34,6 +34,7 @@ import com.example.iremember.screens.MainScreen
 import com.example.iremember.screens.NewsScreen
 import com.example.iremember.screens.NoteEditorScreen
 import com.example.iremember.screens.NotesScreen
+import com.example.iremember.screens.PermissionsScreen
 import com.example.iremember.screens.PrivacyPolicyScreen
 import com.example.iremember.screens.ProfilePhotoCropScreen
 import com.example.iremember.screens.EditProfileScreen
@@ -318,6 +319,9 @@ fun IRememberNavHost(
                 onAboutClick = {
                     navController.navigate(Routes.ABOUT)
                 },
+                onPermissionsClick = {
+                    navController.navigate(Routes.PERMISSIONS)
+                },
                 onAllItemsClick = {
                     navController.navigate(Routes.ALL_ITEMS)
                 },
@@ -502,6 +506,12 @@ fun IRememberNavHost(
                 onPrivacyPolicyClick = {
                     navController.navigate(Routes.PRIVACY_POLICY)
                 }
+            )
+        }
+
+        composable(Routes.PERMISSIONS) {
+            PermissionsScreen(
+                onBackClick = { navController.popBackStack() }
             )
         }
 
