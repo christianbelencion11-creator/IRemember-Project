@@ -40,7 +40,7 @@
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/christianbelencion11-creator/FindIt.git IRemember
+git clone https://github.com/christianbelencion11-creator/IRemember-Project.git IRemember
 
 # 2. Open project in Android Studio
 # Select "Open" and navigate to the cloned IRemember directory
@@ -73,7 +73,7 @@ Conflicting overloads: fun SearchScreen(...)
 1. I-delete o i-rename ang lumang folder sa iyong computer.
 2. Mag-clone ng panibago:
    ```bash
-   git clone https://github.com/christianbelencion11-creator/FindIt.git
+   git clone https://github.com/christianbelencion11-creator/IRemember-Project.git
    ```
 3. Buksan ang bagong na-clone na folder sa Android Studio.
 
