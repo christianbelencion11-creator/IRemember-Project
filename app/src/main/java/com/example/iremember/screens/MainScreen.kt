@@ -175,10 +175,6 @@ fun MainScreen(
                         onUserInteraction()
                         closeDrawerThen { onPermissionsClick() }
                     },
-                    onNews = {
-                        onUserInteraction()
-                        closeDrawerThen { onNotificationsClick() }
-                    },
                     onHelpFeedback = {
                         onUserInteraction()
                         val intent = Intent(Intent.ACTION_SENDTO).apply {

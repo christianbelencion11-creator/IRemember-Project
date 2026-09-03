@@ -18,7 +18,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
@@ -62,7 +61,6 @@ fun IRememberNavigationDrawerContent(
     onActivityLog: () -> Unit,
     onAppSettings: () -> Unit,
     onPermissions: () -> Unit,
-    onNews: () -> Unit,
     onHelpFeedback: () -> Unit,
     onAboutApp: () -> Unit,
     onSignOut: () -> Unit,
@@ -190,12 +188,6 @@ fun IRememberNavigationDrawerContent(
 
             // Section 3: Information & Support
             DrawerSectionHeader(title = "Information & Support")
-            DrawerMenuRow(
-                icon = Icons.AutoMirrored.Filled.Article,
-                title = "News",
-                subtitle = "Headlines near you",
-                onClick = onNews
-            )
             DrawerMenuRow(
                 icon = Icons.AutoMirrored.Outlined.HelpOutline,
                 title = "Help & Feedback",
