@@ -62,7 +62,6 @@ private object ProfileIconAccents {
     val Appearance = Color(0xFFFBBF24)
     val Password = Color(0xFF60A5FA)
     val Notifications = Color(0xFFF59E0B)
-    val Biometrics = Color(0xFF2DD4BF)
     val Camera = Color(0xFFA78BFA)
     val AppSettings = Color(0xFF94A3B8)
     val About = Color(0xFF818CF8)
@@ -461,7 +460,7 @@ private fun SettingsCard(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        "Camera, notifications, and biometrics",
+                        "Camera, notifications, and location",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

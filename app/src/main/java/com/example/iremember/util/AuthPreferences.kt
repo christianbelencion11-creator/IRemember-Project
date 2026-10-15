@@ -60,16 +60,6 @@ class AuthPreferences(context: Context) {
         return prefs.getString(pinHashKey(uid), null) != null
     }
 
-    fun isBiometricEnabled(uid: String = getFirebaseUid()): Boolean {
-        if (uid.isBlank()) return false
-        return prefs.getBoolean(biometricKey(uid), false)
-    }
-
-    fun setBiometricEnabled(enabled: Boolean, uid: String = getFirebaseUid()) {
-        if (uid.isBlank()) return
-        prefs.edit().putBoolean(biometricKey(uid), enabled).apply()
-    }
-
     fun needsUnlock(uid: String = getFirebaseUid()): Boolean =
         uid.isNotBlank() && isLoggedIn() && isPinSet(uid)
 
@@ -140,15 +130,13 @@ class AuthPreferences(context: Context) {
 
     private fun pinSaltKey(uid: String) = "pin_salt_$uid"
 
-    private fun biometricKey(uid: String) = "biometric_enabled_$uid"
-
     /** Remove old device-wide PIN keys from earlier app versions. */
     @Suppress("DEPRECATION")
     private fun clearLegacyPinStorage() {
         prefs.edit()
             .remove(KEY_PIN_HASH)
             .remove(KEY_PIN_SALT)
-            .remove(KEY_BIOMETRIC_ENABLED)
+            .remove("biometric_enabled")
             .apply()
     }
 
@@ -167,7 +155,5 @@ class AuthPreferences(context: Context) {
         private const val KEY_PIN_SALT = "pin_salt"
         @Deprecated("Legacy device-wide PIN — use per-user keys")
         private const val KEY_PIN_HASH = "pin_hash"
-        @Deprecated("Legacy device-wide biometric flag — use per-user keys")
-        private const val KEY_BIOMETRIC_ENABLED = "biometric_enabled"
     }
 }

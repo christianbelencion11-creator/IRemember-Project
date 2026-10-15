@@ -59,7 +59,6 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.coil.compose)
-    implementation(libs.androidx.biometric)
     implementation(libs.androidx.security.crypto)
     implementation(libs.androidx.work.runtime.ktx)
     testImplementation(libs.junit)

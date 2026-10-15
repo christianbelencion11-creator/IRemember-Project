@@ -35,7 +35,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Place
@@ -72,25 +71,13 @@ import com.example.iremember.ui.theme.Dimensions
 import com.example.iremember.ui.theme.Spacing
 import com.example.iremember.ui.theme.darkCardGradientFill
 import com.example.iremember.ui.theme.darkSurfaceBorder
-import androidx.fragment.app.FragmentActivity
 import com.example.iremember.ui.theme.isAppDarkTheme
-import com.example.iremember.util.BiometricHelper
-
-private fun Context.findFragmentActivity(): FragmentActivity? {
-    var c = this
-    while (c is ContextWrapper) {
-        if (c is FragmentActivity) return c
-        c = c.baseContext
-    }
-    return null
-}
 
 @Composable
 fun PermissionsScreen(
     onBackClick: () -> Unit
 ) {
     val context = LocalContext.current
-    val activity = remember(context) { context.findFragmentActivity() }
     var notifRefresh by remember { mutableIntStateOf(0) }
     val navBarBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
@@ -103,10 +90,6 @@ fun PermissionsScreen(
                 android.Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
         }
-    }
-
-    val biometricAvailable = remember(activity) {
-        activity?.let { BiometricHelper.canAuthenticate(it) } == true
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -279,25 +262,7 @@ fun PermissionsScreen(
                             }
                         )
 
-                        HorizontalDivider(
-                            modifier = Modifier.padding(vertical = Spacing.sm),
-                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                        )
 
-                        // Biometrics
-                        PermissionItemRow(
-                            icon = Icons.Default.Fingerprint,
-                            iconTint = Color(0xFF06B6D4),
-                            title = "Biometrics",
-                            subtitle = if (biometricAvailable) {
-                                "Available — used for fingerprint or face unlock"
-                            } else {
-                                "Not set up or unavailable on this device"
-                            },
-                            statusText = if (biometricAvailable) "Available" else "N/A",
-                            statusPositive = biometricAvailable,
-                            onClick = { openAppSettings() }
-                        )
 
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = Spacing.sm),

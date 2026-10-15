@@ -8,7 +8,7 @@
 
 - **Item Tracking & Categorization**: Record belongings with locations, photos, reminders, and tags.
 - **Smart Reminders & Notifications**: Built-in alarms and work-manager scheduled notifications for items and notes.
-- **Card Organizer**: Securely manage digital cards and details with biometric protection support.
+- **Card Organizer**: Securely manage digital cards and details with secure 6-digit MPIN protection.
 - **Notes & Checklists**: Create structured notes with checklist items and reminder dates.
 - **Search & Quick Retrieval**: Instant search and voice search capabilities to locate items quickly.
 - **Dark & Light Mode**: Seamless adaptive theme support tailored for modern Android devices.
@@ -23,7 +23,7 @@
 - **Local Database**: Room 2.8.4 + KSP
 - **Image Loading**: Coil Compose 2.7.0
 - **Background Work**: AndroidX WorkManager 2.10.0
-- **Security & Auth**: AndroidX Biometric & Security Crypto
+- **Security & Auth**: AndroidX Security Crypto & 6-Digit MPIN
 - **Minimum SDK**: Android API 24 (Android 7.0 Nougat)
 - **Target SDK**: Android API 36
 

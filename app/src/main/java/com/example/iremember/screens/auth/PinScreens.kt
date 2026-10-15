@@ -1,40 +1,25 @@
-﻿package com.example.iremember.screens.auth
+package com.example.iremember.screens.auth
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.FragmentActivity
 import com.example.iremember.ui.components.AuthShell
-import com.example.iremember.ui.components.AuthTextColor
 import com.example.iremember.ui.components.PinDots
 import com.example.iremember.ui.components.PinKeypad
 import com.example.iremember.ui.theme.Spacing
 import com.example.iremember.util.AuthPreferences
-import com.example.iremember.util.BiometricHelper
 
 private const val PIN_LENGTH = 6
 
@@ -43,15 +28,10 @@ fun SetupPinScreen(
     authPreferences: AuthPreferences,
     onComplete: () -> Unit
 ) {
-    var step by remember { mutableStateOf(0) }
+    var step by remember { mutableIntStateOf(0) }
     var firstPin by remember { mutableStateOf("") }
     var pin by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
-    val activity = LocalContext.current as? FragmentActivity
-    val biometricAvailable = remember(activity) {
-        activity?.let { BiometricHelper.canAuthenticate(it) } == true
-    }
-    var enableBiometric by remember(biometricAvailable) { mutableStateOf(biometricAvailable) }
 
     fun resetToCreate(keepError: String? = null) {
         step = 0
@@ -94,7 +74,6 @@ fun SetupPinScreen(
                             step = 1
                         } else if (pin == firstPin) {
                             authPreferences.setPin(pin)
-                            authPreferences.setBiometricEnabled(enableBiometric && biometricAvailable)
                             onComplete()
                         } else {
                             resetToCreate("PINs do not match. Start over and try again.")
@@ -122,38 +101,6 @@ fun SetupPinScreen(
                 Text("Start over")
             }
         }
-        if (biometricAvailable) {
-            Spacer(Modifier.height(Spacing.lg))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f),
-                        shape = RoundedCornerShape(18.dp)
-                    )
-                    .padding(horizontal = Spacing.md, vertical = Spacing.sm),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Fingerprint,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(end = Spacing.sm)
-                    )
-                    Text(
-                        text = "Use fingerprint unlock",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = AuthTextColor
-                    )
-                }
-                Switch(
-                    checked = enableBiometric,
-                    onCheckedChange = { enableBiometric = it }
-                )
-            }
-        }
     }
 }
 
@@ -165,21 +112,6 @@ fun UnlockScreen(
 ) {
     var pin by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
-    val activity = LocalContext.current as? FragmentActivity
-    val biometricEnabled = authPreferences.isBiometricEnabled()
-    val biometricAvailable = remember(activity) {
-        activity?.let { BiometricHelper.canAuthenticate(it) } == true
-    }
-
-    LaunchedEffect(biometricEnabled, activity) {
-        if (biometricEnabled && activity != null) {
-            BiometricHelper.showPrompt(
-                activity = activity,
-                onSuccess = onUnlocked,
-                onError = { /* user can use PIN instead */ }
-            )
-        }
-    }
 
     AuthShell(
         title = "Enter your MPIN",
@@ -216,30 +148,6 @@ fun UnlockScreen(
                 if (pin.isNotEmpty()) pin = pin.dropLast(1)
             }
         )
-        if (biometricAvailable && activity != null) {
-            Spacer(Modifier.height(Spacing.lg))
-            OutlinedButton(
-                onClick = {
-                    BiometricHelper.showPrompt(
-                        activity = activity,
-                        onSuccess = onUnlocked,
-                        onError = { msg -> error = msg }
-                    )
-                },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(18.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Fingerprint,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = Spacing.sm)
-                )
-                Text("Use fingerprint")
-            }
-        }
         Spacer(Modifier.height(Spacing.sm))
         TextButton(
             onClick = {
