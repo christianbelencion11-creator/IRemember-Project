@@ -1,4 +1,4 @@
-﻿package com.example.iremember.util
+package com.example.iremember.util
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -41,7 +41,7 @@ suspend fun lastKnownDeviceLocation(context: Context): DeviceLocation? =
         var best: Location? = null
         for (provider in manager.getProviders(true)) {
             val fix = runCatching { manager.getLastKnownLocation(provider) }.getOrNull() ?: continue
-            if (best == null || fix.accuracy < best!!.accuracy) best = fix
+            if (best == null || fix.accuracy < best.accuracy) best = fix
         }
         best?.let { DeviceLocation(it.latitude, it.longitude) }
     }

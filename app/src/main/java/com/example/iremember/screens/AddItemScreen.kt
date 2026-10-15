@@ -418,7 +418,7 @@ fun AddItemScreen(
                         }
                         if (isEditMode) {
                             viewModel.updateItem(
-                                itemId = itemId!!,
+                                itemId = itemId,
                                 name = itemName,
                                 location = location,
                                 category = category,

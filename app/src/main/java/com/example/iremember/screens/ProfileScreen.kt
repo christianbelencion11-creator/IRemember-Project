@@ -1,12 +1,5 @@
 package com.example.iremember.screens
 
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
-import android.provider.Settings
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,16 +16,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.BrightnessAuto
-import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Security
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -46,24 +35,18 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.FragmentActivity
 import com.example.iremember.ui.components.PremiumScaffold
 import com.example.iremember.ui.components.ProfileAvatar
 import com.example.iremember.ui.components.ProfileUpdatedSuccessDialog
-import com.example.iremember.ui.components.StatsSection
 import com.example.iremember.ui.components.TabMenuHeader
 import com.example.iremember.ui.theme.Dimensions
 import com.example.iremember.ui.theme.Spacing
@@ -72,8 +55,6 @@ import com.example.iremember.ui.theme.darkCardGradientFill
 import com.example.iremember.ui.theme.darkSurfaceBorder
 import com.example.iremember.ui.theme.isAppDarkTheme
 import com.example.iremember.ui.theme.mainTabBottomScrollPadding
-import com.example.iremember.util.BiometricHelper
-import com.example.iremember.util.computeStats
 import com.example.iremember.viewmodel.ItemViewModel
 
 /** Soft accent tints for settings/permissions rows (not brand-green only). */
@@ -131,7 +112,7 @@ fun ProfileScreen(
     val bottomScrollPadding = mainTabBottomScrollPadding(bottomNavVisible)
     val scrollState = rememberScrollState()
 
-    androidx.compose.runtime.LaunchedEffect(scrollToSettings) {
+    LaunchedEffect(scrollToSettings) {
         if (scrollToSettings) {
             scrollState.animateScrollTo(scrollState.maxValue)
             onScrollToSettingsConsumed()

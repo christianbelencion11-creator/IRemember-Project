@@ -441,7 +441,7 @@ fun CardEditorScreen(
                                 cardHolder = cardHolder,
                                 cardNumber = cardNumber,
                                 cardType = cardType,
-                                balance = parsedBalance ?: 0.0,
+                                balance = parsedBalance,
                                 colorIndex = colorIndex
                             ) { onBackClick() }
                         },

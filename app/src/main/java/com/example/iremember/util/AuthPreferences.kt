@@ -1,4 +1,4 @@
-﻿package com.example.iremember.util
+package com.example.iremember.util
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -143,6 +143,7 @@ class AuthPreferences(context: Context) {
     private fun biometricKey(uid: String) = "biometric_enabled_$uid"
 
     /** Remove old device-wide PIN keys from earlier app versions. */
+    @Suppress("DEPRECATION")
     private fun clearLegacyPinStorage() {
         prefs.edit()
             .remove(KEY_PIN_HASH)

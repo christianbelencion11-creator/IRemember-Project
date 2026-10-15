@@ -1,4 +1,4 @@
-﻿package com.example.iremember.screens.auth
+package com.example.iremember.screens.auth
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 private data class OnboardPage(
     val title: String,
     val body: String,
-    @DrawableRes val imageRes: Int,
+    @param:DrawableRes val imageRes: Int,
     val primaryCta: String
 )
 

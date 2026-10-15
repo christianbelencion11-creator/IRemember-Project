@@ -1,4 +1,4 @@
-﻿package com.example.iremember.ui.components
+package com.example.iremember.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -148,7 +148,7 @@ fun BankCardFace(
                 )
                 if (canReveal) {
                     IconButton(
-                        onClick = { onToggleReveal?.invoke() },
+                        onClick = onToggleReveal,
                         modifier = Modifier.size(32.dp)
                     ) {
                         Icon(

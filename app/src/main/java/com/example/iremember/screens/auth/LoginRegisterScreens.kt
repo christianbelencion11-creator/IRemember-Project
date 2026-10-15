@@ -522,6 +522,7 @@ fun AuthSectionLabel(text: String) {
     )
 }
 
+@Suppress("DEPRECATION")
 @Composable
 private fun TermsCheckbox(
     checked: Boolean,

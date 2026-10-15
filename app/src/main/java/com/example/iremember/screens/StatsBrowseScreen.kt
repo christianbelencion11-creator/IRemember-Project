@@ -1,4 +1,4 @@
-﻿package com.example.iremember.screens
+package com.example.iremember.screens
 
 import android.app.Activity
 import android.content.ActivityNotFoundException
@@ -496,7 +496,7 @@ fun StatsBrowseScreen(
 
         if (showAddFab) {
             ExtendedFloatingActionButton(
-                onClick = { onAddItemClick?.invoke() },
+                onClick = onAddItemClick,
                 icon = {
                     Icon(
                         imageVector = Icons.Default.Add,

@@ -261,8 +261,7 @@ fun IRememberNavHost(
             )
         }
 
-        composable(Routes.MAIN) {
-            val mainEntry = navController.getBackStackEntry(Routes.MAIN)
+        composable(Routes.MAIN) { mainEntry ->
             var showProfilePhotoUpdated by remember { mutableStateOf(false) }
             val photoUpdatedFlag = mainEntry.savedStateHandle
                 .getStateFlow("profile_photo_updated", false)
