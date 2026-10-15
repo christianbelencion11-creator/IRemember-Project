@@ -1,4 +1,4 @@
-﻿package com.example.iremember.screens
+package com.example.iremember.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.CheckCircle
@@ -37,7 +38,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -55,9 +55,9 @@ import com.example.iremember.ui.components.FoundConfirmDialog
 import com.example.iremember.ui.components.FoundSuccessDialog
 import com.example.iremember.ui.components.HeaderIconButton
 import com.example.iremember.ui.components.PremiumScaffold
-import com.example.iremember.ui.components.RemindMeCard
 import com.example.iremember.ui.components.ZoomableImageViewer
 import com.example.iremember.ui.components.categoryIcon
+import com.example.iremember.util.ReminderTimeUtils
 import com.example.iremember.ui.theme.Dimensions
 import com.example.iremember.ui.theme.IRememberGreen
 import com.example.iremember.ui.theme.IRememberGreenDeep
@@ -78,12 +78,6 @@ fun ItemDetailScreen(
     var showConfirmDialog by remember { mutableStateOf(false) }
     var showSuccessDialog by remember { mutableStateOf(false) }
     var showImageViewer by remember { mutableStateOf(false) }
-    var draftHour by remember(item?.id, item?.remindHour) {
-        mutableIntStateOf(item?.remindHour ?: 8)
-    }
-    var draftMinute by remember(item?.id, item?.remindMinute) {
-        mutableIntStateOf(item?.remindMinute ?: 0)
-    }
 
     if (showImageViewer && item != null && item!!.imageUri.isNotEmpty()) {
         ZoomableImageViewer(
@@ -265,31 +259,20 @@ fun ItemDetailScreen(
                                     "Saved on",
                                     formatDateTime(currentItem.dateCreated)
                                 )
+                                if (currentItem.remindEnabled || currentItem.remindActive) {
+                                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
+                                    DetailRow(
+                                        Icons.Default.Alarm,
+                                        "Reminder",
+                                        if (currentItem.remindNextAt > 0L) {
+                                            formatDateTime(currentItem.remindNextAt)
+                                        } else {
+                                            ReminderTimeUtils.formatTime(currentItem.remindHour, currentItem.remindMinute)
+                                        }
+                                    )
+                                }
                             }
                         }
-
-                        RemindMeCard(
-                            enabled = currentItem.remindEnabled || currentItem.remindActive,
-                            hour = draftHour,
-                            minute = draftMinute,
-                            nextAt = currentItem.remindNextAt,
-                            isActive = currentItem.remindActive,
-                            showActions = true,
-                            onToggle = { checked ->
-                                if (!checked) {
-                                    viewModel.stopReminder(itemId)
-                                }
-                            },
-                            onTimePicked = { h, m ->
-                                draftHour = h
-                                draftMinute = m
-                            },
-                            onEnable = {
-                                viewModel.setReminder(itemId, draftHour, draftMinute)
-                            },
-                            onSnooze = { viewModel.snoozeReminder(itemId) },
-                            onStop = { viewModel.stopReminder(itemId) }
-                        )
                     }
 
                     if (!isAlreadyFound) {

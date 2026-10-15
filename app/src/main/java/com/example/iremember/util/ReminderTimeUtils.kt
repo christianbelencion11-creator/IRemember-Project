@@ -1,4 +1,4 @@
-﻿package com.example.iremember.util
+package com.example.iremember.util
 
 import java.util.Calendar
 
@@ -18,6 +18,20 @@ object ReminderTimeUtils {
         }
         if (cal.timeInMillis <= fromMillis) {
             cal.add(Calendar.DAY_OF_YEAR, 1)
+        }
+        return cal.timeInMillis
+    }
+
+    /** Exact target date (year, month, day) and time (hour, minute). */
+    fun buildWallClockMillis(year: Int, month: Int, day: Int, hour: Int, minute: Int): Long {
+        val cal = Calendar.getInstance().apply {
+            set(Calendar.YEAR, year)
+            set(Calendar.MONTH, month)
+            set(Calendar.DAY_OF_MONTH, day)
+            set(Calendar.HOUR_OF_DAY, hour.coerceIn(0, 23))
+            set(Calendar.MINUTE, minute.coerceIn(0, 59))
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
         }
         return cal.timeInMillis
     }

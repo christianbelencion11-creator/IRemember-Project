@@ -1,4 +1,4 @@
-﻿package com.example.iremember.viewmodel
+package com.example.iremember.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -94,13 +94,14 @@ class ItemViewModel(
         remindEnabled: Boolean = false,
         remindHour: Int = 8,
         remindMinute: Int = 0,
+        remindTargetTime: Long = 0L,
         onSaved: () -> Unit
     ) {
         viewModelScope.launch {
-            val nextAt = if (remindEnabled) {
-                ReminderTimeUtils.nextWallClockMillis(remindHour, remindMinute)
-            } else {
-                0L
+            val nextAt = when {
+                !remindEnabled -> 0L
+                remindTargetTime > 0L -> remindTargetTime
+                else -> ReminderTimeUtils.nextWallClockMillis(remindHour, remindMinute)
             }
             val id = repository.insertItem(
                 Item(
@@ -135,6 +136,7 @@ class ItemViewModel(
         remindEnabled: Boolean = false,
         remindHour: Int = 8,
         remindMinute: Int = 0,
+        remindTargetTime: Long = 0L,
         onUpdated: (Boolean) -> Unit = {}
     ) {
         viewModelScope.launch {
@@ -143,10 +145,10 @@ class ItemViewModel(
                 onUpdated(false)
                 return@launch
             }
-            val nextAt = if (remindEnabled) {
-                ReminderTimeUtils.nextWallClockMillis(remindHour, remindMinute)
-            } else {
-                0L
+            val nextAt = when {
+                !remindEnabled -> 0L
+                remindTargetTime > 0L -> remindTargetTime
+                else -> ReminderTimeUtils.nextWallClockMillis(remindHour, remindMinute)
             }
             val ok = repository.updateItem(
                 existing.copy(

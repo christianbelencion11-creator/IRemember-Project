@@ -1,5 +1,6 @@
-﻿package com.example.iremember.ui.components
+package com.example.iremember.ui.components
 
+import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -16,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -38,11 +40,12 @@ import androidx.compose.ui.unit.dp
 import com.example.iremember.ui.theme.Dimensions
 import com.example.iremember.ui.theme.Spacing
 import com.example.iremember.util.ReminderTimeUtils
+import com.example.iremember.util.formatDate
 import com.example.iremember.util.formatDateTime
+import java.util.Calendar
 
 /**
- * Remind Me card — toggle + time picker. Use [onEnable] when turning on / saving time;
- * [onSnooze]/[onStop] when reminder is active on an existing item.
+ * Remind Me card — toggle with Date and Time pickers.
  */
 @Composable
 fun RemindMeCard(
@@ -53,16 +56,41 @@ fun RemindMeCard(
     isActive: Boolean = false,
     showActions: Boolean = false,
     onToggle: (Boolean) -> Unit,
-    onTimePicked: (hour: Int, minute: Int) -> Unit,
+    onTimePicked: (hour: Int, minute: Int) -> Unit = { _, _ -> },
+    onScheduleChanged: (hour: Int, minute: Int, targetMillis: Long) -> Unit = { _, _, _ -> },
     onEnable: () -> Unit = {},
     onSnooze: () -> Unit = {},
     onStop: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    var localHour by remember(hour) { mutableIntStateOf(hour) }
-    var localMinute by remember(minute) { mutableIntStateOf(minute) }
+
+    val initialCalendar = remember(nextAt, hour, minute) {
+        Calendar.getInstance().apply {
+            if (nextAt > System.currentTimeMillis()) {
+                timeInMillis = nextAt
+            } else {
+                set(Calendar.HOUR_OF_DAY, hour.coerceIn(0, 23))
+                set(Calendar.MINUTE, minute.coerceIn(0, 59))
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+                if (timeInMillis <= System.currentTimeMillis()) {
+                    add(Calendar.DAY_OF_YEAR, 1)
+                }
+            }
+        }
+    }
+
+    var localYear by remember(nextAt, hour, minute) { mutableIntStateOf(initialCalendar.get(Calendar.YEAR)) }
+    var localMonth by remember(nextAt, hour, minute) { mutableIntStateOf(initialCalendar.get(Calendar.MONTH)) }
+    var localDay by remember(nextAt, hour, minute) { mutableIntStateOf(initialCalendar.get(Calendar.DAY_OF_MONTH)) }
+    var localHour by remember(nextAt, hour, minute) { mutableIntStateOf(initialCalendar.get(Calendar.HOUR_OF_DAY)) }
+    var localMinute by remember(nextAt, hour, minute) { mutableIntStateOf(initialCalendar.get(Calendar.MINUTE)) }
     var pendingEnable by remember { mutableStateOf(false) }
+
+    fun currentCalculatedMillis(): Long {
+        return ReminderTimeUtils.buildWallClockMillis(localYear, localMonth, localDay, localHour, localMinute)
+    }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -86,13 +114,37 @@ fun RemindMeCard(
         }
     }
 
+    fun openDatePicker() {
+        val dpd = DatePickerDialog(
+            context,
+            { _, y, m, d ->
+                localYear = y
+                localMonth = m
+                localDay = d
+                val millis = currentCalculatedMillis()
+                onScheduleChanged(localHour, localMinute, millis)
+                onTimePicked(localHour, localMinute)
+                if (enabled || isActive) {
+                    onEnable()
+                }
+            },
+            localYear,
+            localMonth,
+            localDay
+        )
+        dpd.datePicker.minDate = System.currentTimeMillis() - 1000
+        dpd.show()
+    }
+
     fun openTimePicker() {
         TimePickerDialog(
             context,
             { _, h, m ->
                 localHour = h
                 localMinute = m
-                onTimePicked(h, m)
+                val millis = currentCalculatedMillis()
+                onScheduleChanged(localHour, localMinute, millis)
+                onTimePicked(localHour, localMinute)
                 if (enabled || isActive) {
                     onEnable()
                 }
@@ -137,7 +189,7 @@ fun RemindMeCard(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "Notify until you snooze or stop",
+                            text = "Set date & time alert notification",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -158,29 +210,50 @@ fun RemindMeCard(
 
             if (enabled || isActive) {
                 Spacer(Modifier.height(Spacing.md))
-                OutlinedButton(
-                    onClick = { openTimePicker() },
-                    modifier = Modifier.fillMaxWidth()
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.AccessTime,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .padding(end = Spacing.sm)
-                            .size(20.dp)
-                    )
-                    Text(
-                        text = "Notify at ${ReminderTimeUtils.formatTime(localHour, localMinute)}"
-                    )
+                    OutlinedButton(
+                        onClick = { openDatePicker() },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CalendarToday,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(end = Spacing.xs)
+                                .size(18.dp)
+                        )
+                        Text(
+                            text = formatDate(currentCalculatedMillis()),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    OutlinedButton(
+                        onClick = { openTimePicker() },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AccessTime,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(end = Spacing.xs)
+                                .size(18.dp)
+                        )
+                        Text(
+                            text = ReminderTimeUtils.formatTime(localHour, localMinute),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
-                if (nextAt > 0L && isActive) {
-                    Text(
-                        text = "Next: ${formatDateTime(nextAt)} · repeats every 15 min",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = Spacing.sm)
-                    )
-                }
+                Spacer(Modifier.height(Spacing.xs))
+                Text(
+                    text = "Scheduled: ${formatDateTime(currentCalculatedMillis())}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(top = Spacing.xs)
+                )
                 if (showActions && isActive) {
                     Spacer(Modifier.height(Spacing.md))
                     Row(

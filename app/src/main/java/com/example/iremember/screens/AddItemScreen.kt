@@ -52,6 +52,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -111,6 +112,7 @@ fun AddItemScreen(
     var remindEnabled by remember { mutableStateOf(false) }
     var remindHour by remember { mutableIntStateOf(8) }
     var remindMinute by remember { mutableIntStateOf(0) }
+    var remindTargetTime by remember { mutableLongStateOf(0L) }
     var formLoaded by remember { mutableStateOf(!isEditMode) }
     var showErrors by remember { mutableStateOf(false) }
     var showPhotoSourcePicker by remember { mutableStateOf(false) }
@@ -131,6 +133,7 @@ fun AddItemScreen(
             remindEnabled = item.remindEnabled
             remindHour = item.remindHour
             remindMinute = item.remindMinute
+            remindTargetTime = item.remindNextAt
             formLoaded = true
         }
     }
@@ -385,10 +388,16 @@ fun AddItemScreen(
                     enabled = remindEnabled,
                     hour = remindHour,
                     minute = remindMinute,
+                    nextAt = remindTargetTime,
                     onToggle = { remindEnabled = it },
                     onTimePicked = { h, m ->
                         remindHour = h
                         remindMinute = m
+                    },
+                    onScheduleChanged = { h, m, targetMillis ->
+                        remindHour = h
+                        remindMinute = m
+                        remindTargetTime = targetMillis
                     },
                     onEnable = { remindEnabled = true },
                     onStop = { remindEnabled = false }
@@ -427,6 +436,7 @@ fun AddItemScreen(
                                 remindEnabled = remindEnabled,
                                 remindHour = remindHour,
                                 remindMinute = remindMinute,
+                                remindTargetTime = remindTargetTime,
                                 onUpdated = { ok ->
                                     if (ok) {
                                         savedItemName = itemName
@@ -444,6 +454,7 @@ fun AddItemScreen(
                                 remindEnabled = remindEnabled,
                                 remindHour = remindHour,
                                 remindMinute = remindMinute,
+                                remindTargetTime = remindTargetTime,
                                 onSaved = {
                                     savedItemName = itemName
                                     itemName = ""
@@ -454,6 +465,7 @@ fun AddItemScreen(
                                     remindEnabled = false
                                     remindHour = 8
                                     remindMinute = 0
+                                    remindTargetTime = 0L
                                     showErrors = false
                                     showSuccessDialog = true
                                 }

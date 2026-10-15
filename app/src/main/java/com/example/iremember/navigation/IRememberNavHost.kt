@@ -338,7 +338,7 @@ fun IRememberNavHost(
                 onLogout = {
                     authRepository.signOut()
                     navController.navigate(Routes.LOGIN) {
-                        popUpTo(Routes.MAIN) { inclusive = true }
+                        popUpTo(0) { inclusive = true }
                     }
                 }
             )
